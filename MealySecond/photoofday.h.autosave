@@ -1,0 +1,30 @@
+#ifndef PHOTOOFDAY_H
+#define PHOTOOFDAY_H
+
+#include <QString>
+#include <QDate>
+#include <QList>
+
+class PhotoOfDay
+{
+
+    private:
+        QDate today;
+        QString tag;
+        QString place;
+
+    public:
+        QList<QString> image_list;
+
+        PhotoOfDay ( QDate &date );
+        void AddImage(QString image_name);
+        void removeImage(QString image_name);
+        bool ImageListIsEmpty();
+        QString ImageListBegin();
+        QString* listBegin();
+        
+        virtual int getCategory();
+
+};
+
+#endif // PHOTOOFDAY_H
