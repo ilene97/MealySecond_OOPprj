@@ -57,6 +57,7 @@ void TagImage::SetTag(QString str){
     this->setWindowTitle(str);
 }
 
+
 void TagImage::SetLabel(){
 
     if(tagImage[0]->getIsImage()){

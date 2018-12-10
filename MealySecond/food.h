@@ -19,6 +19,7 @@ class Food
         int category;
         int dishCategory;
         bool isImage;
+        int rating;
 
     public:
         Food();
@@ -27,17 +28,19 @@ class Food
 
         void setImage(QString image_name);
         void setCategory(int categ);
-
-        QString getPlace();
+        void setDishCategory(int categ);
+        void setCategory();
+        void setRating(int rating);
         void setTag(QString tag);
         void setPlace(QString place);
+
+        QString getPlace();
         bool getIsImage();
         QString getImage();
         QDate getDate();
         int getCategory();
-        int getDishCategory();
-        void setDishCategory(int categ);
-        void setCategory();
+        int getDishCategory();  
+        int getRating();
 
 };
 

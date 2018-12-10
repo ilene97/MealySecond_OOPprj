@@ -11,6 +11,12 @@
 #include <QToolButton>
 #include <QMap>
 #include <QList>
+#include <QPalette>
+#include <QVBoxLayout>
+#include <QtSql>
+#include <QSqlQuery>
+#include <QFileInfo>
+#include "recommend.h"
 
 #include "food.h"
 #include "addimagedialog.h"
@@ -34,6 +40,7 @@ public:
     QString GetTagName();
 
     bool GetIsTag();
+
 };
 
 class MainWindow : public QMainWindow
@@ -46,7 +53,7 @@ public:
     QMap<QDate,QList<Food>> photosInDay;
 
     explicit MainWindow(QWidget *parent = nullptr);
-
+    void RecommendFood(QString category);
     ~MainWindow();
 
 signals:
@@ -68,6 +75,12 @@ private slots:
     void on_tag6_bt_clicked();
     void on_tag7_bt_clicked();
     void on_tag8_bt_clicked();
+
+    void on_mealButton_clicked();
+
+    void on_dessertButton_clicked();
+
+    void on_midsnackButton_clicked();
 
 private:
     Tag * tag[8];

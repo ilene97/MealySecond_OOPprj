@@ -97,7 +97,7 @@ void AddImageDialog::on_OKButton_clicked()
             category = "MidnightSnack";
             break;
         default:
-            photooftoday = new Food(date); //need modify
+            photooftoday = new Food(date);
             break;
     }
 

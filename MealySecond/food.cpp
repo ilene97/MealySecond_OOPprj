@@ -55,3 +55,11 @@ int Food::getCategory(){
 int Food::getDishCategory(){
     return dishCategory;
 }
+
+void Food::setRating(int rating){
+    this->rating = rating;
+}
+int Food::getRating(){
+    return this->rating;
+}
+

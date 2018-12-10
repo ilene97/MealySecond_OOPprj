@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui charts sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,7 +36,10 @@ SOURCES += \
     allimage.cpp \
     allimage.cpp \
     info.cpp \
-    tagimage.cpp
+    tagimage.cpp \
+    midnightchart.cpp \
+    userchart.cpp \
+    recommend.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -49,7 +52,10 @@ HEADERS += \
     allimage.h \
     filter.h \
     info.h \
-    tagimage.h
+    tagimage.h \
+    midnightchart.h \
+    userchart.h \
+    recommend.h
 
 FORMS += \
         mainwindow.ui \

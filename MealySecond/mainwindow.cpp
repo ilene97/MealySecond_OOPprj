@@ -4,6 +4,13 @@
 #include "filter.h"
 #include "allimage.h"
 #include "tagimage.h"
+#include "userchart.h"
+#include "midnightchart.h"
+#include "QVector"
+#include "dish.h"
+#include "dessert.h"
+#include "midnightsnack.h"
+#include "food.h"
 
 #include <QFileDialog>
 #include <QList>
@@ -66,6 +73,22 @@ MainWindow::MainWindow(QWidget *parent)
         ui->logo->setStyleSheet("border-image:url(C:/Users/ilene/Documents/Visual Studio 2017/Qt Projects/CalendarFunction/mealysecond.png)");
         ui->tag_filter->setStyleSheet("border-image:url(C:/Users/ilene/Documents/Visual Studio 2017/Qt Projects/CalendarFunction/tagfilter.png)");
         ui->all_images->setStyleSheet("border-image:url(C:/Users/ilene/Documents/Visual Studio 2017/Qt Projects/CalendarFunction/viewall.png)");
+
+        ui->mealButton->setStyleSheet("border-image:url(C:/Users/ilene/Documents/Visual Studio 2017/Qt Projects/CalendarFunction/mealbutton.png)");
+        ui->dessertButton->setStyleSheet("border-image:url(C:/Users/ilene/Documents/Visual Studio 2017/Qt Projects/CalendarFunction/dessertbutton.png)");
+        ui->midsnackButton->setStyleSheet("border-image:url(C:/Users/ilene/Documents/Visual Studio 2017/Qt Projects/CalendarFunction/snackbutton.png)");
+        ui->label_4->setStyleSheet("border-image:url(C:/Users/ilene/Documents/Visual Studio 2017/Qt Projects/CalendarFunction/recommendment.png)");
+
+        QVBoxLayout *vbox = new QVBoxLayout();
+            ui->groupBox->setLayout(vbox);
+            QVBoxLayout *vbox2 = new QVBoxLayout();
+            ui->groupBox_3->setLayout(vbox2);
+
+            UserChart * userchart = new UserChart();
+            vbox->addWidget(userchart->getChart());
+
+            MidnightChart * midnightChart = new MidnightChart();
+            vbox2->addWidget(midnightChart->getMignightChart());
 
 }
 
@@ -151,6 +174,7 @@ void MainWindow::addFoodinMap(QDate date, Food *food){
     }
     photosInDay.find(date).value().push_back(*food);
 }
+
 
 Tag::Tag():isTag(false){
     tagname = "";
@@ -315,3 +339,144 @@ void MainWindow::on_tag8_bt_clicked()
     }
 }
 
+
+void MainWindow::on_mealButton_clicked()
+{
+    RecommendFood("Dish");
+}
+
+void MainWindow::on_dessertButton_clicked()
+{
+    RecommendFood("Dessert");
+}
+
+void MainWindow::on_midsnackButton_clicked()
+{
+    RecommendFood("MidnightSnack");
+}
+
+
+void MainWindow::RecommendFood(QString category){
+
+    QVector<Food> vecFood;
+    QVector<Food> tempvecFood;
+    QVector<Recommend> vecFoodRecommend;
+    int tempIndex[30];
+    QDate curDate = curDate.currentDate();
+    QDate date;
+    int year, month, day,rating;
+    QString tag, place;
+    QSqlQuery *qry = new QSqlQuery(mydb);
+
+    int count =0;
+    int i=0;
+    int tempMax=0;
+
+    //*********************getting records with "2 or more times" (to calculate daysNotEat)****************************************
+
+    qry->exec("select Year, Month, Day, Tag, Place, Rating from INFO where Category = '"+category+"' and Place in (select Place from INFO group by Place having count(*) > 1) order by Place");
+    while(qry->next()){
+        QSqlRecord mrecord = qry->record();
+
+        year = mrecord.value(0).toInt();
+        month = mrecord.value(1).toInt();
+        day = mrecord.value(2).toInt();
+        date.setDate(year,month,day);
+
+        tag = mrecord.value(3).toString();
+        place = mrecord.value(4).toString();
+        rating = mrecord.value(5).toInt();
+
+        Food food = Food(date);
+        food.setPlace(place);
+        food.setTag(tag);
+        food.setRating(rating);
+        tempvecFood.push_back(food);
+    }
+
+    QVector<Food>::iterator pos;
+
+    QDate compareDate = tempvecFood.begin()->getDate();
+
+    for(pos = tempvecFood.begin();pos!=tempvecFood.end();++pos){
+        QDate tempDate;
+        int temp;
+
+        if((pos+1) == tempvecFood.end()){
+            if(compareDate < pos->getDate()){
+            tempIndex[i] = count;
+            }
+            else{
+            tempIndex[i] = tempMax;
+            }
+            vecFood.push_back(tempvecFood[tempIndex[i]]);
+        }
+        else if(pos->getPlace() != (pos+1)->getPlace()){
+            tempIndex[i] = tempMax++;
+
+            compareDate = (pos+1)->getDate();
+            vecFood.push_back(tempvecFood[tempIndex[i++]]);
+        }
+        else{
+            if((pos)->getDate().daysTo((pos+1)->getDate())>0){
+                tempDate = (pos+1)->getDate();
+                temp =count+1;
+            }
+            else{
+                tempDate = pos->getDate();
+                temp = count;
+            }
+
+            if(compareDate<tempDate){
+                tempMax = temp;
+                compareDate = tempDate;
+            }
+       }
+        count++;
+    }
+    qDebug()<<"recommend befo";
+
+    QVector<Food>::iterator iter;
+    int num=0;
+    for (iter=vecFood.begin();iter!=vecFood.end();iter++) {
+        int temp = tempIndex[0] + 1;
+        if(num!=0)
+            temp = tempIndex[num]-tempIndex[num-1];
+
+        Recommend recFood(iter->getPlace(), date.daysTo(iter->getDate()),temp,iter->getRating());
+        vecFoodRecommend.push_back(recFood);
+    }
+
+    //*********************getting 'Dessert' records without overlap (only 1 time)****************************************
+    qry->exec("SELECT Year, Month, Day, Tag, Place, Rating from INFO where Category = '"+category+"' group by Place having count(*) = 1");
+    while(qry->next()){
+            QSqlRecord mrecord = qry->record();
+            year = mrecord.value(0).toInt();
+            month = mrecord.value(1).toInt();
+            day = mrecord.value(2).toInt();
+
+            date.setDate(year,month,day);
+            tag = mrecord.value(3).toString();
+            place = mrecord.value(4).toString();
+            rating = mrecord.value(5).toInt();
+
+            Food food= Food(date);
+            food.setPlace(place);
+            food.setTag(tag);
+            food.setRating(rating);
+            vecFood.push_back(food);
+
+            Recommend recFood(place, date.daysTo(curDate) ,1,rating);
+            vecFoodRecommend.push_back(recFood);          //final result score calculation from vecDesRecommend
+    }
+
+    std::sort(vecFoodRecommend.begin(), vecFoodRecommend.end());
+
+    QVector<Recommend>::iterator it;
+    for(it = vecFoodRecommend.begin();it!=vecFoodRecommend.end();it++)
+        qDebug()<<it->getPlace()<<" "<<QString::number(it->getFinalScore());
+
+    QString finalString = vecFoodRecommend.first().getPlace();
+    ui->label_2->setText(finalString);
+
+}
