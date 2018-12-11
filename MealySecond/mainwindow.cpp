@@ -84,10 +84,10 @@ MainWindow::MainWindow(QWidget *parent)
             QVBoxLayout *vbox2 = new QVBoxLayout();
             ui->groupBox_3->setLayout(vbox2);
 
-            UserChart * userchart = new UserChart();
+            userchart = new UserChart();
             vbox->addWidget(userchart->getChart());
 
-            MidnightChart * midnightChart = new MidnightChart();
+            midnightChart = new MidnightChart();
             vbox2->addWidget(midnightChart->getMignightChart());
 
 }

@@ -20,6 +20,8 @@
 
 #include "food.h"
 #include "addimagedialog.h"
+#include "midnightchart.h"
+#include "userchart.h"
 
 namespace Ui {
 class MainWindow;
@@ -88,6 +90,9 @@ private:
     QDate today;
     int today_int;
     QSqlDatabase mydb;
+
+    MidnightChart * midnightChart;
+    UserChart * userchart;
 
 };
 
